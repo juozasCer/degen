@@ -124,12 +124,11 @@ loadPNGBackground();
 
 
 audio.play();
-
+velocity.x = 0;
+velocity.y = 0;
+velocity.z = 0;
     // Set camera position y to 11.6
-    camera.position.y = 11.6;
-    camera.position.z = 0;
-    camera.position.x =0;
-    
+    camera.position.set(0, 11.6, 0); // Exact teleport position
     
 
   };
