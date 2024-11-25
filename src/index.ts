@@ -93,6 +93,13 @@ const playTransitionVideo = () => {
   if (isVideoPlaying) return;
 
   isVideoPlaying = true;
+  // Call this function to load the PNG background
+loadPNGBackground();
+    // Remove the position constraints or set them bigger
+    minX = -4;
+    maxX = 4;
+    minZ = -3.5;
+    maxZ = 3;
 
   // Create a video element
   const video = document.createElement('video');
@@ -114,13 +121,9 @@ const playTransitionVideo = () => {
         video.parentNode.removeChild(video);
       }
     isVideoPlaying = false;
-// Call this function to load the PNG background
-loadPNGBackground(); audio.play();
-    // Remove the position constraints or set them bigger
-    minX = -4;
-    maxX = 4;
-    minZ = -3.5;
-    maxZ = 3;
+
+
+audio.play();
 
     // Set camera position y to 11.6
     camera.position.y = 11.6;
@@ -270,12 +273,12 @@ function light() {
   dirLight.shadow.normalBias = 0.05; // Smooth normals in shadows
   scene.add(dirLight.target);
   scene.add(dirLight);
-  scene.add(new THREE.CameraHelper(dirLight.shadow.camera));
+//   scene.add(new THREE.CameraHelper(dirLight.shadow.camera));
 }
 
 function light2() {
   // scene.add(new THREE.AmbientLight(0xffffff, 0.7))
-  const pointLight = new THREE.PointLight(0xffffff, 1, 8); // Color, intensity, distance
+  const pointLight = new THREE.PointLight(0xffffff, 1, 10); // Color, intensity, distance
   pointLight.position.set(0, 15, 0);
   pointLight.castShadow = true;
 
@@ -290,7 +293,7 @@ function light2() {
 
   // Helper to visualize shadow camera
   const pointLightHelper1 = new THREE.PointLightHelper(pointLight, 1); // 1 is the helper size
-  scene.add(pointLightHelper1);
+//   scene.add(pointLightHelper1);
 }
 light2();
 
