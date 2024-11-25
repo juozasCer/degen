@@ -107,24 +107,28 @@ const playTransitionVideo = () => {
   video.style.height = '100%';
   video.style.objectFit = 'cover';
   video.style.zIndex = '1000';
-
+  const audio = new Audio('/media/music.mp3'); // Path to your MP3 file
   video.onended = () => {
     // Remove the video element after playback
     if (video.parentNode) {
         video.parentNode.removeChild(video);
       }
     isVideoPlaying = false;
-
+// Call this function to load the PNG background
+loadPNGBackground(); audio.play();
     // Remove the position constraints or set them bigger
-    minX = -100;
-    maxX = 100;
-    minZ = -100;
-    maxZ = 100;
+    minX = -4;
+    maxX = 4;
+    minZ = -3.5;
+    maxZ = 3;
 
     // Set camera position y to 11.6
     camera.position.y = 11.6;
     camera.position.z = 0;
     camera.position.x =0;
+    
+    
+
   };
   document.body.appendChild(video);
 };
@@ -177,7 +181,7 @@ function animate() {
     const position = controls.getObject().position;
     position.x = THREE.MathUtils.clamp(position.x, minX, maxX); // Limit x
     position.z = THREE.MathUtils.clamp(position.z, minZ, maxZ); // Limit z
-    // console.log(camera.position);
+    console.log(camera.position);
 
     // Check if camera is within specified coordinates
     if (
@@ -341,8 +345,6 @@ function loadModel() {
 
 loadModel();
 
-import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
-
 // Function to load PNG background
 function loadPNGBackground() {
     const textureLoader = new THREE.TextureLoader();
@@ -351,8 +353,8 @@ function loadPNGBackground() {
       function (texture) {
         texture.mapping = THREE.EquirectangularReflectionMapping;
   
-        // Set the environment map and background
-        // scene.environment = texture;
+        // Set the environment map and bac`kground
+        scene.environment = texture;
         scene.background = texture;
   
         console.log('PNG background loaded successfully:', texture);
@@ -364,5 +366,3 @@ function loadPNGBackground() {
     );
   }
   
-  // Call this function to load the PNG background
-  loadPNGBackground();
