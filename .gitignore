@@ -1,8 +1,5 @@
-
 .cache/
 coverage/
-dist/*
-!dist/index.html
 node_modules/
 *.log
 
@@ -14,5 +11,3 @@ node_modules/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-index.js
