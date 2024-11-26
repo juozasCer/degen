@@ -22,7 +22,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 1.6, 0);
+camera.position.set(-0.85, 1.6, 1.8);
 
 // RENDERER
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -37,18 +37,49 @@ renderer.toneMappingExposure = 1.5; // Adjust as needed
 const controls = new PointerLockControls(camera, renderer.domElement);
 scene.add(controls.getObject());
 
-// Pointer lock event listeners
-document.addEventListener(
-  'click',
-  () => {
-    if (!controls.isLocked) {
-      setTimeout(() => {
-        controls.lock(); // Lock the pointer after a 1 second delay
-      }, 0);
+// Create a "Click to Play" overlay
+const clickToPlayOverlay = document.createElement('div');
+clickToPlayOverlay.id = 'click-to-play-overlay';
+clickToPlayOverlay.style.position = 'absolute';
+clickToPlayOverlay.style.top = '0';
+clickToPlayOverlay.style.left = '0';
+clickToPlayOverlay.style.width = '100%';
+clickToPlayOverlay.style.height = '100%';
+clickToPlayOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+clickToPlayOverlay.style.color = 'white';
+clickToPlayOverlay.style.display = 'flex';
+clickToPlayOverlay.style.justifyContent = 'center';
+clickToPlayOverlay.style.alignItems = 'center';
+clickToPlayOverlay.style.zIndex = '0';
+clickToPlayOverlay.style.backgroundImage = "url('textures/HOMESCREEN.png')";
+clickToPlayOverlay.style.fontSize = '24px';
+clickToPlayOverlay.style.cursor = 'pointer';
+clickToPlayOverlay.textContent = 'Click to Play';
+document.body.appendChild(clickToPlayOverlay);
+
+// Variable to track whether loading is complete
+let isLoading = true;
+
+// Update the overlay to prevent clicks while loading
+clickToPlayOverlay.style.pointerEvents = isLoading ? 'none' : 'auto';
+
+// Remove the overlay on click and lock pointer (only if not loading)
+clickToPlayOverlay.addEventListener('click', () => {
+    if (!isLoading && !controls.isLocked) {
+        controls.lock();
     }
-  },
-  false
-);
+});
+
+controls.addEventListener('lock', () => {
+    if (!isLoading) {
+        clickToPlayOverlay.style.display = 'none'; // Hide overlay when pointer is locked
+    }
+});
+controls.addEventListener('unlock', () => {
+    clickToPlayOverlay.style.display = 'flex'; // Show overlay when pointer is released
+});
+
+
 
 // LIGHTS
 // light()
@@ -129,7 +160,7 @@ velocity.y = 0;
 velocity.z = 0;
     // Set camera position y to 11.6
     camera.position.set(0, 11.6, 0); // Exact teleport position
-    
+    camera.lookAt(0,11.6,0)
 
   };
   document.body.appendChild(video);
@@ -183,7 +214,7 @@ function animate() {
     const position = controls.getObject().position;
     position.x = THREE.MathUtils.clamp(position.x, minX, maxX); // Limit x
     position.z = THREE.MathUtils.clamp(position.z, minZ, maxZ); // Limit z
-    console.log(camera.position);
+    // console.log(camera.position);
 
     // Check if camera is within specified coordinates
     if (
@@ -319,6 +350,7 @@ light3();
 
 function loadModel() {
   const loader = new GLTFLoader();
+  const blocker = document.getElementById('blocker');
 
   loader.load(
     './models/FINALMAP.gltf', // Adjust the path as needed
@@ -329,6 +361,10 @@ function loadModel() {
         if (child instanceof THREE.Mesh) {
           child.castShadow = true;
           child.receiveShadow = true;
+          child.material.transparent = false;
+    child.material.opacity = 1;
+    child.material.depthWrite = true; // Ensure correct rendering order
+child.material.depthTest = true;
         }
       });
 
@@ -337,6 +373,12 @@ function loadModel() {
       model.scale.set(1, 1, 1);
 
       scene.add(model);
+      if (blocker) {
+        blocker.style.display = 'none';
+    }
+      // Update loading status
+      isLoading = false;
+      clickToPlayOverlay.style.pointerEvents = 'auto'; // Enable clicks on overlay
     },
     undefined,
     function (error) {
@@ -367,4 +409,50 @@ function loadPNGBackground() {
       }
     );
   }
+  import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
+
+  // ADD REFLECTOR PLANE
+  addReflectorPlane(); // **Added Reflector Plane**
   
+  function addReflectorPlane() {
+    // Custom dimensions based on desired coordinate spans
+    const WIDTH = 16.5;   // From x = -5 to x = +15
+    const LENGTH = 12.9;  // From z = -4 to z = +10
+  
+    // Create the plane geometry with the specified width and length
+    const geometry = new THREE.PlaneGeometry(WIDTH, LENGTH);
+  
+    // Create the Reflector with desired properties
+    const reflector = new Reflector(geometry, {
+      clipBias: 0.003,
+      textureWidth: window.innerWidth * window.devicePixelRatio,
+      textureHeight: window.innerHeight * window.devicePixelRatio,
+      color: 0x777777
+    });
+  
+    // Rotate the plane to lie horizontally (on the XZ plane)
+    reflector.rotation.x = - Math.PI / 2;
+  
+    // Position the reflector to cover from x = -5 to x = +15 and z = -4 to z = +10
+    reflector.position.set(1, 10.15, 1); // x=5, y=10.15, z=3
+  
+    // Optional: If you need to adjust further (e.g., scaling), you can do so here
+    // reflector.scale.set(1, 1, 1);
+  
+    // Add the reflector to the scene
+    scene.add(reflector);
+  }
+
+const planeGeometry = new THREE.PlaneGeometry(16.5, 12.7);
+const planeMaterial = new THREE.MeshStandardMaterial({
+  color: 0xffffff,      // White color
+  roughness: 0.3,       // Adjust roughness (0 = smooth, 1 = rough)
+  metalness: 1,        // Adjust metalness (0 = non-metal, 1 = metal)
+  transparent:true,
+  opacity:0.9
+});
+
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.rotation.x = -Math.PI / 2; // Rotate to lie horizontally
+plane.position.set(1, 10.2, 1);
+scene.add(plane);
