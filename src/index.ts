@@ -210,7 +210,7 @@ function animate() {
     direction.x = Number(moveRight) - Number(moveLeft);
     direction.normalize();
 
-    const speed = 50; // Movement speed
+    const speed = 30; // Movement speed
     if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
     if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
 
@@ -469,33 +469,28 @@ plane.rotation.x = -Math.PI / 2; // Rotate to lie horizontally
 plane.position.set(1, 10.2, 1);
 scene.add(plane);
 
-// Get the "LOADING..." text element and assert that it's an HTML element
-const loadingText = document.querySelector('.contact-address') as HTMLElement | null;
+const contactAddresses = document.querySelectorAll<HTMLElement>('.contact-address');
 
-// Check if the element exists before proceeding
-if (loadingText) {
-  // Hover effect to change opacity
-  loadingText.addEventListener('mouseover', () => {
-    loadingText.style.opacity = '0.5'; // Set opacity to 0.5 on hover
-  });
+if (contactAddresses.length > 0) {
+  contactAddresses.forEach((addressElement) => {
+    addressElement.addEventListener('mouseover', () => {
+      addressElement.style.opacity = '0.5';
+    });
 
-  loadingText.addEventListener('mouseout', () => {
-    loadingText.style.opacity = '1'; // Reset opacity when not hovering
-  });
+    addressElement.addEventListener('mouseout', () => {
+      addressElement.style.opacity = '1';
+    });
 
-  // Click event to copy the contents to the clipboard
-  loadingText.addEventListener('click', () => {
-    if (loadingText) {
-      const textToCopy = loadingText.innerText; // Get the text inside the span
+    addressElement.addEventListener('click', () => {
+      const textToCopy = addressElement.innerText;
 
-      // Use the Clipboard API to copy the text
       navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Copied to clipboard: ' + textToCopy); // Optional: Alert user
+        alert('Copied to clipboard: ' + textToCopy);
       }).catch(err => {
-        console.error('Error copying text: ', err); // Handle errors
+        console.error('Error copying text: ', err);
       });
-    }
+    });
   });
 } else {
-  console.warn("The element '.contact-address' was not found.");
+  console.warn("No elements with class '.contact-address' were found.");
 }

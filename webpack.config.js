@@ -48,13 +48,13 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        // { from: 'src/fonts', to: 'fonts' }, // Copy fonts folder
+        { from: 'src/fonts', to: 'fonts' }, // Copy fonts folder
         // { from: 'src/images', to: 'images' }, // Copy images folder
         { from: 'src/media', to: 'media' }, // Copy media folder
         { from: 'src/models', to: 'models' }, // Copy models folder
         { from: 'src/textures', to: 'textures' },
         { from: 'src/style.css', to: 'style.css' },
-        // { from: 'favicon.ico', to: 'favicon.ico' }, 
+        { from: 'favicon.ico', to: 'favicon.ico' }, 
       ],
     }),
   ],
