@@ -37,47 +37,42 @@ renderer.toneMappingExposure = 1.5; // Adjust as needed
 const controls = new PointerLockControls(camera, renderer.domElement);
 scene.add(controls.getObject());
 
-// Create a "Click to Play" overlay
-const clickToPlayOverlay = document.createElement('div');
-clickToPlayOverlay.id = 'click-to-play-overlay';
-clickToPlayOverlay.style.position = 'absolute';
-clickToPlayOverlay.style.top = '0';
-clickToPlayOverlay.style.left = '0';
-clickToPlayOverlay.style.width = '100%';
-clickToPlayOverlay.style.height = '100%';
-clickToPlayOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
-clickToPlayOverlay.style.color = 'white';
-clickToPlayOverlay.style.display = 'flex';
-clickToPlayOverlay.style.justifyContent = 'center';
-clickToPlayOverlay.style.alignItems = 'center';
-clickToPlayOverlay.style.zIndex = '0';
-clickToPlayOverlay.style.backgroundImage = "url('textures/HOMESCREEN.png')";
-clickToPlayOverlay.style.fontSize = '24px';
-clickToPlayOverlay.style.cursor = 'pointer';
-clickToPlayOverlay.textContent = 'Click to Play';
-document.body.appendChild(clickToPlayOverlay);
+const startBtn = document.getElementById('startBtn');
+const clickToPlayOverlay = document.getElementById('click-to-play-overlay');
+const blurOverlay = document.getElementById('blur-overlay');
 
 // Variable to track whether loading is complete
 let isLoading = true;
 
-// Update the overlay to prevent clicks while loading
-clickToPlayOverlay.style.pointerEvents = isLoading ? 'none' : 'auto';
-
-// Remove the overlay on click and lock pointer (only if not loading)
-clickToPlayOverlay.addEventListener('click', () => {
+if (!clickToPlayOverlay || !blurOverlay) {
+  console.error('clickToPlayOverlay or blurOverlay element not found!');
+} else {
+  // Example event listeners for the overlay
+  clickToPlayOverlay.style.pointerEvents = isLoading ? 'none' : 'auto';
+if(startBtn){
+  startBtn.addEventListener('click', () => {
     if (!isLoading && !controls.isLocked) {
-        controls.lock();
+      controls.lock();
     }
-});
+  });}
 
-controls.addEventListener('lock', () => {
+  controls.addEventListener('lock', () => {
     if (!isLoading) {
-        clickToPlayOverlay.style.display = 'none'; // Hide overlay when pointer is locked
+      clickToPlayOverlay.style.display = 'none'; // Hide initial overlay when pointer is locked
+      blurOverlay.style.display = 'none'; // Hide blur overlay when pointer is locked
     }
-});
-controls.addEventListener('unlock', () => {
-    clickToPlayOverlay.style.display = 'flex'; // Show overlay when pointer is released
-});
+  });
+
+  blurOverlay.addEventListener('click', () => {
+    if (!isLoading && !controls.isLocked) {
+      controls.lock();
+    }
+  });
+
+  controls.addEventListener('unlock', () => {
+    blurOverlay.style.display = 'flex'; // Show blur overlay when pointer is released
+  });
+}
 
 
 
@@ -125,12 +120,12 @@ const playTransitionVideo = () => {
 
   isVideoPlaying = true;
   // Call this function to load the PNG background
-loadPNGBackground();
-    // Remove the position constraints or set them bigger
-    minX = -4;
-    maxX = 4;
-    minZ = -3.5;
-    maxZ = 3;
+  loadPNGBackground();
+  // Remove the position constraints or set them bigger
+  minX = -4;
+  maxX = 4;
+  minZ = -3.5;
+  maxZ = 3;
 
   // Create a video element
   const video = document.createElement('video');
@@ -149,18 +144,18 @@ loadPNGBackground();
   video.onended = () => {
     // Remove the video element after playback
     if (video.parentNode) {
-        video.parentNode.removeChild(video);
-      }
+      video.parentNode.removeChild(video);
+    }
     isVideoPlaying = false;
 
 
-audio.play();
-velocity.x = 0;
-velocity.y = 0;
-velocity.z = 0;
+    audio.play();
+    velocity.x = 0;
+    velocity.y = 0;
+    velocity.z = 0;
     // Set camera position y to 11.6
     camera.position.set(0, 11.6, 0); // Exact teleport position
-    camera.lookAt(0,11.6,0)
+    camera.lookAt(0, 11.6, 0)
 
   };
   document.body.appendChild(video);
@@ -193,7 +188,19 @@ function animate() {
 
   const delta = clock.getDelta();
   const elapsedTime = clock.getElapsedTime();
-
+  if (
+    !isLoading && // Add this condition
+    camera.position.x >= -1.2 &&
+    camera.position.x <= 0.5 &&
+    Math.abs(camera.position.y - 1.6) < 0.01 &&
+    Math.abs(camera.position.z - -2.5) < 0.8
+  ) {
+    // Show the button
+    button.style.display = 'block';
+  } else {
+    // Hide the button
+    button.style.display = 'none';
+  }
   if (controls.isLocked === true) {
     // Update movement
     velocity.x -= velocity.x * 10.0 * delta;
@@ -265,13 +272,13 @@ function generateFloor() {
     displacementScale: 0.1,
     aoMap: sandAmbientOcclusion,
   });
-   // Add null checks before wrapping textures
-   if (material.map) wrapAndRepeatTexture(material.map);
-   if (material.normalMap) wrapAndRepeatTexture(material.normalMap);
-   if (material.displacementMap) wrapAndRepeatTexture(material.displacementMap);
-   if (material.aoMap) wrapAndRepeatTexture(material.aoMap);
-   // const material = new THREE.MeshPhongMaterial({ map: placeholder})
- 
+  // Add null checks before wrapping textures
+  if (material.map) wrapAndRepeatTexture(material.map);
+  if (material.normalMap) wrapAndRepeatTexture(material.normalMap);
+  if (material.displacementMap) wrapAndRepeatTexture(material.displacementMap);
+  if (material.aoMap) wrapAndRepeatTexture(material.aoMap);
+  // const material = new THREE.MeshPhongMaterial({ map: placeholder})
+
 
   const floor = new THREE.Mesh(geometry, material);
   floor.receiveShadow = true;
@@ -303,7 +310,7 @@ function light() {
   dirLight.shadow.normalBias = 0.05; // Smooth normals in shadows
   scene.add(dirLight.target);
   scene.add(dirLight);
-//   scene.add(new THREE.CameraHelper(dirLight.shadow.camera));
+  //   scene.add(new THREE.CameraHelper(dirLight.shadow.camera));
 }
 
 function light2() {
@@ -323,7 +330,7 @@ function light2() {
 
   // Helper to visualize shadow camera
   const pointLightHelper1 = new THREE.PointLightHelper(pointLight, 1); // 1 is the helper size
-//   scene.add(pointLightHelper1);
+  //   scene.add(pointLightHelper1);
 }
 light2();
 
@@ -362,9 +369,9 @@ function loadModel() {
           child.castShadow = true;
           child.receiveShadow = true;
           child.material.transparent = false;
-    child.material.opacity = 1;
-    child.material.depthWrite = true; // Ensure correct rendering order
-child.material.depthTest = true;
+          child.material.opacity = 1;
+          child.material.depthWrite = true; // Ensure correct rendering order
+          child.material.depthTest = true;
         }
       });
 
@@ -375,10 +382,15 @@ child.material.depthTest = true;
       scene.add(model);
       if (blocker) {
         blocker.style.display = 'none';
-    }
+      }
       // Update loading status
       isLoading = false;
-      clickToPlayOverlay.style.pointerEvents = 'auto'; // Enable clicks on overlay
+
+      if (!clickToPlayOverlay) {
+        console.error('clickToPlayOverlay element not found!');
+      } else {
+        clickToPlayOverlay.style.pointerEvents = 'auto'; // Enable clicks on overlay
+      }
     },
     undefined,
     function (error) {
@@ -391,68 +403,99 @@ loadModel();
 
 // Function to load PNG background
 function loadPNGBackground() {
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(
-      './textures/kloofendal_48d_partly_cloudy_puresky_1k.png', // Path to your PNG file
-      function (texture) {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
-  
-        // Set the environment map and bac`kground
-        scene.environment = texture;
-        scene.background = texture;
-  
-        console.log('PNG background loaded successfully:', texture);
-      },
-      undefined,
-      function (error) {
-        console.error('An error occurred while loading the PNG:', error);
-      }
-    );
-  }
-  import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
+  const textureLoader = new THREE.TextureLoader();
+  textureLoader.load(
+    './textures/kloofendal_48d_partly_cloudy_puresky_1k.png', // Path to your PNG file
+    function (texture) {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
 
-  // ADD REFLECTOR PLANE
-  addReflectorPlane(); // **Added Reflector Plane**
-  
-  function addReflectorPlane() {
-    // Custom dimensions based on desired coordinate spans
-    const WIDTH = 16.5;   // From x = -5 to x = +15
-    const LENGTH = 12.9;  // From z = -4 to z = +10
-  
-    // Create the plane geometry with the specified width and length
-    const geometry = new THREE.PlaneGeometry(WIDTH, LENGTH);
-  
-    // Create the Reflector with desired properties
-    const reflector = new Reflector(geometry, {
-      clipBias: 0.003,
-      textureWidth: window.innerWidth * window.devicePixelRatio,
-      textureHeight: window.innerHeight * window.devicePixelRatio,
-      color: 0x777777
-    });
-  
-    // Rotate the plane to lie horizontally (on the XZ plane)
-    reflector.rotation.x = - Math.PI / 2;
-  
-    // Position the reflector to cover from x = -5 to x = +15 and z = -4 to z = +10
-    reflector.position.set(1, 10.15, 1); // x=5, y=10.15, z=3
-  
-    // Optional: If you need to adjust further (e.g., scaling), you can do so here
-    // reflector.scale.set(1, 1, 1);
-  
-    // Add the reflector to the scene
-    scene.add(reflector);
-  }
+      // Set the environment map and bac`kground
+      scene.environment = texture;
+      scene.background = texture;
+
+      console.log('PNG background loaded successfully:', texture);
+    },
+    undefined,
+    function (error) {
+      console.error('An error occurred while loading the PNG:', error);
+    }
+  );
+}
+import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
+
+// ADD REFLECTOR PLANE
+addReflectorPlane(); // **Added Reflector Plane**
+
+function addReflectorPlane() {
+  // Custom dimensions based on desired coordinate spans
+  const WIDTH = 16.5;   // From x = -5 to x = +15
+  const LENGTH = 12.9;  // From z = -4 to z = +10
+
+  // Create the plane geometry with the specified width and length
+  const geometry = new THREE.PlaneGeometry(WIDTH, LENGTH);
+
+  // Create the Reflector with desired properties
+  const reflector = new Reflector(geometry, {
+    clipBias: 0.003,
+    textureWidth: window.innerWidth * window.devicePixelRatio,
+    textureHeight: window.innerHeight * window.devicePixelRatio,
+    color: 0x777777
+  });
+
+  // Rotate the plane to lie horizontally (on the XZ plane)
+  reflector.rotation.x = - Math.PI / 2;
+
+  // Position the reflector to cover from x = -5 to x = +15 and z = -4 to z = +10
+  reflector.position.set(1, 10.15, 1); // x=5, y=10.15, z=3
+
+  // Optional: If you need to adjust further (e.g., scaling), you can do so here
+  // reflector.scale.set(1, 1, 1);
+
+  // Add the reflector to the scene
+  scene.add(reflector);
+}
 
 const planeGeometry = new THREE.PlaneGeometry(16.5, 12.7);
 const planeMaterial = new THREE.MeshStandardMaterial({
   color: 0xffffff,      // White color
   roughness: 0.3,       // Adjust roughness (0 = smooth, 1 = rough)
   metalness: 1,        // Adjust metalness (0 = non-metal, 1 = metal)
-  transparent:true,
-  opacity:0.9
+  transparent: true,
+  opacity: 0.9
 });
 
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2; // Rotate to lie horizontally
 plane.position.set(1, 10.2, 1);
 scene.add(plane);
+
+// Get the "LOADING..." text element and assert that it's an HTML element
+const loadingText = document.querySelector('.contact-address') as HTMLElement | null;
+
+// Check if the element exists before proceeding
+if (loadingText) {
+  // Hover effect to change opacity
+  loadingText.addEventListener('mouseover', () => {
+    loadingText.style.opacity = '0.5'; // Set opacity to 0.5 on hover
+  });
+
+  loadingText.addEventListener('mouseout', () => {
+    loadingText.style.opacity = '1'; // Reset opacity when not hovering
+  });
+
+  // Click event to copy the contents to the clipboard
+  loadingText.addEventListener('click', () => {
+    if (loadingText) {
+      const textToCopy = loadingText.innerText; // Get the text inside the span
+
+      // Use the Clipboard API to copy the text
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        alert('Copied to clipboard: ' + textToCopy); // Optional: Alert user
+      }).catch(err => {
+        console.error('Error copying text: ', err); // Handle errors
+      });
+    }
+  });
+} else {
+  console.warn("The element '.contact-address' was not found.");
+}

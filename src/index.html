@@ -1,17 +1,66 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>three.js example</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="blocker">
-      <div id="loader">
-        <p id="loading-text">Loading...</p>
-      </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>three.js Example</title>
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://degen-three-alpha.vercel.app/">
+  <meta property="og:title" content="DeGENsim">
+  <meta property="og:description" content="DeGENsim">
+  <meta property="og:image" content="https://degen-three-alpha.vercel.app/textures/BANNER.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://degen-three-alpha.vercel.app/">
+  <meta property="twitter:title" content="DeGENsim">
+  <meta property="twitter:description" content="DeGENsim">
+  <meta property="twitter:image" content="https://degen-three-alpha.vercel.app/textures/BANNER.png">
+
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="blocker">
+    <div id="loader">
+      <p id="loading-text">Loading...</p>
+    </div>
   </div>
-    <div><span><i>E</i></span></div>
-    <script src="index.js"></script>
-  </body>
+
+  <div id="click-to-play-overlay">
+    <div class="shift">
+    <div class="instructions">
+      <p>Walk - <a class="key">W</a><a class="key">A</a><a class="key">S</a><a class="key">D</a></p>
+      <p>Interact - <a class="key">E</a></p>
+    </div>
+    <div class="border">
+      <a class="startBtn" id="startBtn">START SIMULATION</a>
+    </div>
+    <a class="contact-address">G1gt2avXuYrTMhLuu7k3g1yHuaMjtojEaRJUYQhbpump</a>
+    <div class="ass">
+      <a href="https://x.com/MuseumAI_" target="_blank">
+        <img src="textures/x.svg" alt="X.com" />
+      </a>
+      <a href="https://pump.fun" target="_blank">
+        <img src="textures/dex.svg" alt="Pump.fun" />
+      </a>
+    </div>
+  </div>
+  </div>
+  
+
+  <!-- Blur Overlay -->
+  <div id="blur-overlay"></div>
+
+  <!-- Interactive Element -->
+  <div id="interactive-element">
+    <span><i>E</i></span>
+  </div>
+
+  <script src="index.js"></script>
+</body>
 </html>

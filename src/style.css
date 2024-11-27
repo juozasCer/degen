@@ -1,25 +1,108 @@
-body {
-  margin: 0px;
-  height: 100vh; /* Full viewport height */
-  display: flex; /* Flexbox for centering */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  font-family: fantasy;
-  font-size: 20px;
+@font-face {
+  font-family: 'CustomFont';
+  src: url('textures/OCRAStd.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* General Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: "CustomFont";
+}
+
+/* Blocker (Loading Screen) */
+#blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 1) url('textures/LOAD.png') no-repeat center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+#loader {
+  color: white;
+  text-align: center;
+  margin-top: 400px;
+}
+
+/* Click-to-Play Overlay */
+#click-to-play-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3) url('textures/HOMESCREEN.png') no-repeat center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9;
+  flex-direction: column;
+}
+
+.border {
+  border: 2px solid white;
+  border-radius: 50px;
+  padding: 20px;
+}
+
+.startBtn {
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+.startBtn:hover {
+  opacity: 0.7;
+}
+
+/* Blur Overlay */
+#blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 8;
+  color: white;
+  font-size: 24px;
+}
+
+/* Interactive Element */
+#interactive-element {
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
 }
 
 span {
-  position: relative;
-  display: none; /* Initially hide the button */
+  display: block;
   width: 80px;
   height: 80px;
-  /* padding: 8px 15px; */
   border-radius: 10px;
   background: linear-gradient(180deg, #282828, #202020);
   box-shadow: inset -8px 0 8px rgba(0, 0, 0, 0.15),
-    inset 0 -8px 8px rgba(0, 0, 0, 0.25), 0 0 0 0px rgba(0, 0, 0, 0.75),
-    10px 20px 25px rgba(0, 0, 0, 0.4);
+              inset 0 -8px 8px rgba(0, 0, 0, 0.25),
+              0 0 0 0px rgba(0, 0, 0, 0.75),
+              10px 20px 25px rgba(0, 0, 0, 0.4);
   overflow: hidden;
+  position: relative;
 }
 
 span::before {
@@ -32,56 +115,72 @@ span::before {
   background: linear-gradient(90deg, #232323, #4a4a4a);
   border-radius: 10px;
   box-shadow: -10px -10px 10px rgba(255, 255, 255, 0.25),
-    10px 5px 10px rgba(0, 0, 0, 0.15);
-  border-left: 1px solid #0004;
-  border-bottom: 1px solid #0004;
-  border-top: 1px solid #0009;
+              10px 5px 10px rgba(0, 0, 0, 0.15);
+  border-left: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
 }
 
 span i {
-  position: relative;
   color: white;
-  font-style: normal;
+  position: absolute;
   left: 15px;
   top: 10px;
   text-transform: uppercase;
+  font-size: 16px;
 }
 
-div {
-  position: absolute;
-  left: 50px;
+/* Utility Classes */
+.hidden {
+  display: none;
 }
 
-.transition-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1000;
-}
-#blocker {
-  position: absolute;
-  background-image: url(textures/LOAD.png);
-  /* background-size: contain; */
-  background-repeat: no-repeat;
-  background-position: center;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 1);
-  /* Solid background color */
+.visible {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
 }
 
-#loader {
+.contact-address {
+  color: white;
+  font-size: 18px;
+  margin-top: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.instructions {
+  color: white;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.key {
+  border: 1px solid white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 0 5px;
+}
+
+.ass {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+img {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+img:hover{
+opacity: 0.5;
+}
+
+.shift{
+  left: 500px;
   position: relative;
   text-align: center;
-  color: white;
-  top:200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
