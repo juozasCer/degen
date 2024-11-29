@@ -49,12 +49,13 @@ if (!clickToPlayOverlay || !blurOverlay) {
 } else {
   // Example event listeners for the overlay
   clickToPlayOverlay.style.pointerEvents = isLoading ? 'none' : 'auto';
-if(startBtn){
-  startBtn.addEventListener('click', () => {
-    if (!isLoading && !controls.isLocked) {
-      controls.lock();
-    }
-  });}
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      if (!isLoading && !controls.isLocked) {
+        controls.lock();
+      }
+    });
+  }
 
   controls.addEventListener('lock', () => {
     if (!isLoading) {
@@ -70,11 +71,11 @@ if(startBtn){
   });
 
   controls.addEventListener('unlock', () => {
-    blurOverlay.style.display = 'flex'; // Show blur overlay when pointer is released
+    if (blurOverlay) {
+      blurOverlay.style.display = 'flex'; // Show blur overlay when pointer is released
+    }
   });
 }
-
-
 
 // LIGHTS
 // light()
@@ -148,15 +149,13 @@ const playTransitionVideo = () => {
     }
     isVideoPlaying = false;
 
-
     audio.play();
     velocity.x = 0;
     velocity.y = 0;
     velocity.z = 0;
     // Set camera position y to 11.6
     camera.position.set(0, 11.6, 0); // Exact teleport position
-    camera.lookAt(0, 11.6, 0)
-
+    camera.lookAt(0, 11.6, 0);
   };
   document.body.appendChild(video);
 };
@@ -164,11 +163,14 @@ const playTransitionVideo = () => {
 // Add event listeners for the keyboard
 document.addEventListener('keydown', (event) => {
   if (event.key === 'e' || event.key === 'E') {
-    pressButton();
+    // Only proceed if blurOverlay is not visible
+    if (blurOverlay && (blurOverlay.style.display === 'none' || !blurOverlay.style.display)) {
+      pressButton();
 
-    // Check if the button is visible
-    if (button.style.display !== 'none') {
-      playTransitionVideo();
+      // Check if the button is visible
+      if (button.style.display !== 'none') {
+        playTransitionVideo();
+      }
     }
   }
 });
@@ -188,8 +190,12 @@ function animate() {
 
   const delta = clock.getDelta();
   const elapsedTime = clock.getElapsedTime();
+
+  // Only show the button if blurOverlay is not visible
   if (
     !isLoading && // Add this condition
+    blurOverlay &&
+    (blurOverlay.style.display === 'none' || !blurOverlay.style.display) && // Add this condition
     camera.position.x >= -1.2 &&
     camera.position.x <= 0.5 &&
     Math.abs(camera.position.y - 1.6) < 0.01 &&
@@ -201,6 +207,7 @@ function animate() {
     // Hide the button
     button.style.display = 'none';
   }
+
   if (controls.isLocked === true) {
     // Update movement
     velocity.x -= velocity.x * 10.0 * delta;
@@ -224,7 +231,11 @@ function animate() {
     // console.log(camera.position);
 
     // Check if camera is within specified coordinates
+    // Only show the button if blurOverlay is not visible
     if (
+      !isLoading &&
+      blurOverlay &&
+      (blurOverlay.style.display === 'none' || !blurOverlay.style.display) && // Add this condition
       camera.position.x >= -1.2 &&
       camera.position.x <= 0.5 &&
       Math.abs(camera.position.y - 1.6) < 0.01 &&
@@ -278,7 +289,6 @@ function generateFloor() {
   if (material.displacementMap) wrapAndRepeatTexture(material.displacementMap);
   if (material.aoMap) wrapAndRepeatTexture(material.aoMap);
   // const material = new THREE.MeshPhongMaterial({ map: placeholder})
-
 
   const floor = new THREE.Mesh(geometry, material);
   floor.receiveShadow = true;
@@ -335,7 +345,7 @@ function light2() {
 light2();
 
 function light3() {
-  scene.add(new THREE.AmbientLight(0xFFFF00, 0.1));
+  scene.add(new THREE.AmbientLight(0xffff00, 0.1));
   const pointLight1 = new THREE.PointLight(0xffffff, 1, 8); // Color, intensity, distance
   pointLight1.position.set(-1, 1.5, -2.8);
   pointLight1.castShadow = true;
@@ -409,7 +419,7 @@ function loadPNGBackground() {
     function (texture) {
       texture.mapping = THREE.EquirectangularReflectionMapping;
 
-      // Set the environment map and bac`kground
+      // Set the environment map and background
       scene.environment = texture;
       scene.background = texture;
 
@@ -428,8 +438,8 @@ addReflectorPlane(); // **Added Reflector Plane**
 
 function addReflectorPlane() {
   // Custom dimensions based on desired coordinate spans
-  const WIDTH = 16.5;   // From x = -5 to x = +15
-  const LENGTH = 12.9;  // From z = -4 to z = +10
+  const WIDTH = 16.5; // From x = -5 to x = +15
+  const LENGTH = 12.9; // From z = -4 to z = +10
 
   // Create the plane geometry with the specified width and length
   const geometry = new THREE.PlaneGeometry(WIDTH, LENGTH);
@@ -439,11 +449,11 @@ function addReflectorPlane() {
     clipBias: 0.003,
     textureWidth: window.innerWidth * window.devicePixelRatio,
     textureHeight: window.innerHeight * window.devicePixelRatio,
-    color: 0x777777
+    color: 0x777777,
   });
 
   // Rotate the plane to lie horizontally (on the XZ plane)
-  reflector.rotation.x = - Math.PI / 2;
+  reflector.rotation.x = -Math.PI / 2;
 
   // Position the reflector to cover from x = -5 to x = +15 and z = -4 to z = +10
   reflector.position.set(1, 10.15, 1); // x=5, y=10.15, z=3
@@ -457,11 +467,11 @@ function addReflectorPlane() {
 
 const planeGeometry = new THREE.PlaneGeometry(16.5, 12.7);
 const planeMaterial = new THREE.MeshStandardMaterial({
-  color: 0xffffff,      // White color
-  roughness: 0.3,       // Adjust roughness (0 = smooth, 1 = rough)
-  metalness: 1,        // Adjust metalness (0 = non-metal, 1 = metal)
+  color: 0xffffff, // White color
+  roughness: 0.3, // Adjust roughness (0 = smooth, 1 = rough)
+  metalness: 1, // Adjust metalness (0 = non-metal, 1 = metal)
   transparent: true,
-  opacity: 0.9
+  opacity: 0.9,
 });
 
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -484,11 +494,14 @@ if (contactAddresses.length > 0) {
     addressElement.addEventListener('click', () => {
       const textToCopy = addressElement.innerText;
 
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        alert('Copied to clipboard: ' + textToCopy);
-      }).catch(err => {
-        console.error('Error copying text: ', err);
-      });
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          alert('Copied to clipboard: ' + textToCopy);
+        })
+        .catch((err) => {
+          console.error('Error copying text: ', err);
+        });
     });
   });
 } else {
